@@ -1,0 +1,797 @@
+<html>
+    <head>
+        <!-- MS Word on Windows doesn't realise the encoding is UTF-8 unless this meta tag is present -->
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <base href="https://wiki.cdnetworks.com/confluence" />
+        <title>study</title>
+        <style>
+            body, p, td, table, tr, .bodytext, .stepfield {
+	            font-family: Arial, Helvetica, FreeSans, sans-serif;
+            }
+            .panel {
+                margin: 10px;
+                padding: 10px;
+                border: 1px solid #999;
+                background-color: #f0f0f0;
+            }
+            .noteMacro { border-style: solid; border-width: 1px; border-color: #F0C000; background-color: #FFFFCE; text-align:left;}
+            .warningMacro { border-style: solid; border-width: 1px; border-color: #c00; background-color: #fcc; text-align:left;}
+            .infoMacro { border-style: solid; border-width: 1px; border-color: #69c; background-color: #D8E4F1; text-align:left;}
+            .tipMacro { border-style: solid; border-width: 1px; border-color: #090; background-color: #dfd; text-align:left;}
+            .informationMacroPadding { padding: 5px 0 0 5px; }
+
+            table.infoMacro td, table.warningMacro td, table.tipMacro td, table.noteMacro td, table.sectionMacro td {
+                border: none;
+            }
+
+            .grid {
+                margin: 2px 0px 5px 0px;
+                border-collapse: collapse;
+            }
+            .grid th  {
+                border: 1px solid #ccc;
+                padding: 2px 4px 2px 4px;
+                background: #f0f0f0;
+                text-align: center;
+            }
+            .grid td  {
+                border: 1px solid #ccc;
+                padding: 3px 4px 3px 4px;
+            }
+        </style>
+    </head>
+
+    <body style="background-color: white; padding: 10px;">
+    	        <h1>study</h1>
+       
+              <h1>deploy</h1>
+       <p>참조 url : <a href="https://tutorial.djangogirls.org/ko/deploy/" class="external-link" rel="nofollow">https://tutorial.djangogirls.org/ko/deploy/</a></p>
+              <h1>docker</h1>
+       <h4 id="docker-docker-compose???">docker-compose ???</h4><ul><li>multi-container를 돌리기 위한 tool</li></ul><h4 id="docker-docker,docker-composeinstall">docker, docker-compose install</h4><hr /><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: bash; gutter: false" style="font-size:12px;">$ curl -fsSL https://get.docker.com/ | sudo sh
+$ sudo usermod -aG docker $USER // 현재 접속중인 사용자에게 권한주기
+$ docker --version // version 확인
+Docker version 17.12.0-ce, build c97c6d6
+ 
+ 
+$ sudo su - // root로 로그인
+$ curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` &gt; /usr/local/bin/docker-compose
+$ chmod +x /usr/local/bin/docker-compose // 실행 권한 주기
+$ docker-compose --version // 버전 체크
+docker-compose version 1.18.0, build 8dd22a9</pre>
+</div></div><p> </p><h4 id="docker-docker명령어">docker 명령어</h4><hr /><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: bash; gutter: false" style="font-size:12px;">$ docker exec -it $(service) bash // docker bash로 변경 ex) service는 docker ps로 확인 후 NAME
+$ docker attach $(service)    // docker 표준출력
+ 
+$ docker-compose up // 실행
+$ docker-compose stop // background로 실행한 경우( -d)의 끄는 방법 
+$ docker-compose down // container 완전 삭제</pre>
+</div></div><p> </p><h4 id="docker-docker-compose.yml">docker-compose.yml</h4><hr /><p>image나 build 지시자가 반드시 있어야 함.</p><ul><li>image : 사용할 이미지의 태그나 ID를 명시. 로컬에 그 이미지가 없으면 원격 저장소에서 pull해서 가져옴</li><li>build : Dockerfile이 있는 디렉토리 경로. compose가 이 경로에 있는 Dockerfile을 빌드해서 사용</li><li>dockerfile : 기본 Dockerfile이 아니라 여기에 지정된 파일명을 Dockerfile로 인식해서 빌드해서 사용</li><li>command : 기본 command를 여기에 명시된 명령어로 오버라이드 해서 사용</li><li>links : 컨테이너를 다른 서비스들과 연결. 연결하려는 서비스 이름을 쓰거나 별칭 사용 가능.<ul><li>해당 컨테이너의 /etc/hosts 파일에 그 내용이 추가되어서 컨테이너에서 다른 컨테이너에 접근 가능함.</li></ul></li><li>external_links : links와 비슷한 방식이지만 compose 내부의 컨테이너가 아니라 compose 외부에 있는 서비스와 연결할 때 사용</li><li>extra_hosts : /etc/hosts에 추가할 외부 호스트를 명시</li><li>ports : 호스트포트 : 컨테이너포트 형식으로 씀  Tip: 문자열로 선언하는게 좋음</li><li>expose :  호스트에는 노출X, 연결된 서비스끼리만 접근 가능한 포트 (호스트에서 접근 불가)</li><li>volumns :  현재 디렉토리를 볼륨으로 마운트할때 컨테이너에서 사용할 path. ex) host:container , host:container:permission</li><li>columnes_from :  다른 서비스나 컨테이너의 전체 볼륨을 마운트</li><li>environment : 환경변수 설정 (배열이나 딕셔너리 형태로)</li><li>env_file : 환경변수를 파일에서 불러올때 사용 (n개 가능)</li><li>extends :  다른 서비스를 현재 파일에서 가져와서 확장해서 사용 (다른 yml파일의 다른 서비스 정보드를 오버라이드 해서 사용)</li><li>labels : 컨테이너에 메타데이터 추가  Tip. DNS 표기를 역으로 하는 방식 추천</li><li>container_name :  컨테이너에서 사용할 이름</li><li>log driver : json-file, syslog, none 이렇게 세개 사용 가능.</li><li>net :  네트워킹 모드 (docker -net 옵션과 같음)</li><li>pid : 호스트 PID모드로 설정하게되면 같은 PID 주소 공간을 공유하게 됨. 컨테이너들이 서로 접근 가능해짐</li><li>dns : 커스텀 DNS 서버 설정. ex) dns : 8.8.8.8</li><li>cap_add, cap_drop : 시스템에 관한 권한을 추가하거나 삭제 (ALL, NET_ADMIN 등..)</li><li>dns_search : dns 검색 도메인 설정</li><li>device : 디바이스 맵핑 목록 (docker --device 옵션과 같음)</li><li>security_opt :  각 컨테이너의 기본 label을 오버라아드함.</li></ul><h4 id="docker-dockercommand">docker command</h4><hr /><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: bash; gutter: false" style="font-size:12px;">// docker command
+$ docker ps //  현재 실행중인 container 목록
+$ docker ps -a // 생성한 전체 container 목록
+$ docker start $container_name // docker 실행
+$ docker attach $container_name // container 접속
+ 
+$ // docker run options ...
+$ docker run -it // container의 표준 입력과 호스트의 키보드 입력을 연결
+$ docker --rm //  container를 종료할 때 삭제
+$ docker -p // container 외부와 내부를 연결할 포트
+$ docker -d // background로 실행</pre>
+</div></div>
+              <h1>Go</h1>
+       <h4 id="Go-교재:http://pyrasis.com/book/GoForTheReallyImpatient">교재 : <a href="http://pyrasis.com/book/GoForTheReallyImpatient" class="external-link" rel="nofollow">http://pyrasis.com/book/GoForTheReallyImpatient</a></h4><h4 id="Go-tutorial:https://go-tour-kr.appspot.com/#1">tutorial : <a href="https://go-tour-kr.appspot.com/#1" class="external-link" rel="nofollow">https://go-tour-kr.appspot.com/#1</a></h4><hr /><p> </p><h4 id="Go-install">install</h4><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: bash; gutter: false" style="font-size:12px;">$ sudo apt-get update
+$ sudo apt-get install golang</pre>
+</div></div><p> </p><h4 id="Go-settingsdirectory">settings directory</h4><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: bash; gutter: false" style="font-size:12px;">$ mkdir /home/hwaeunseo/workspace/go
+$ export GOPATH=/home/hwaeunseo/workspace/go</pre>
+</div></div><p><span style="color: rgb(0,0,0);font-size: 1.2em;"><br /></span></p><h6 id="Go-settingsvimrc"><span style="color: rgb(0,0,0);font-size: 1.2em;">settings vim rc </span><span style="color: rgb(0,0,0);font-size: 1.2em;">    </span><a href="attach_d47d3f52a71623cc032eac49348fb0cc">go.vim</a></h6><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: bash; gutter: false" style="font-size:12px;">let mysyntaxfile = &quot;/home/hwaeunseo/.vim/syntax/go.vim&quot;
+syntax on 
+set nu 
+set ai 
+set tabstop=4
+set ruler
+set laststatus=2
+set showmode
+set expandtab
+let loaded_matchparen=1</pre>
+</div></div><p> </p><h4 id="Go-syntaxcheck">syntax check</h4><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: bash; gutter: false" style="font-size:12px;">$ gofmt $filename   // 확인 가능
+$ gofmt -w $filename //  정렬된 내용을 원본 파일에 다시 저장 </pre>
+</div></div><p> </p><hr /><p>8. 실수</p><ul><li>실수 값을 바로 == 로 검사하면 잘못된 결과가 나올 수 있음. 머신 엡실론을 이용하여 비교하여야 함. (머신 엡실론 : 1e-14)</li></ul><p>9. 문자열 사용하기</p><ul><li>여러준 문자열 사용 ``(백쿼트)로 묶어줌 // python의 &quot;&quot;&quot; &quot;&quot;&quot;와 같음</li><li>변수에 문자열을 저장한 뒤에는 내용을 수정할 수 없음. // 바로 수정 안됨, compile error</li></ul><p>11. 상수</p><ul><li>const 키워드로 상수 사용 // 고정된 값 사용</li><li>상수값 순서대로 생성 iota를 사용<ul><li><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: bash; gutter: false" style="font-size:12px;">const ( 
+	a = iota    // 0
+	b			// 1
+	c			// 2
+	d			// 3
+	e			// 4
+	f			// 5
+) 
+ 
+1부터 시작하려면  iota + 1을 대입</pre>
+</div></div></li></ul></li></ul>
+              <h1>go 2회차(unit 13~20)</h1>
+       <p>13. 연산자 알아보기</p><ul><li>gofmt을 이용하면 우선순위가 높은 쪽의 공백을 삭제하여 서로 붙여줌. (일관성 없어 보임)</li><li>ex) a := 3 * 5 + 2 * 7    ==&gt; a := 3*5 + 2*7</li></ul><p> </p><p>14. 패키지 사용</p><ul><li>전역 패키지로 사용할땐<ul><li>import . &quot;fmt&quot; // 패키지 이름 앞에 . (점)을 사용. 그럼 Println와 같이 바로 사용 가능.</li></ul></li><li>패키지 별칭<ul><li>import f &quot;fmt&quot; // fmt을 f로 가져옴. f.Println으로 사용 가능</li></ul></li><li>Import후에 사용하지 않으면 컴파일 에러 발생. _ 사용해야함. (불편..)</li></ul><p>16. if 조건문 안에서 함수 사용하기</p><ul><li>if 조건문 안에서 함수를 실행하고 ;(세미콜론)으로 구분한 뒤 조건식 작성</li><li><span style="color: rgb(255,0,0);">memory 절약 가능</span></li></ul>Error rendering macro 'code': Invalid value specified for parameter 'lang'<pre>if b, err := ioutil.ReadFile(&quot;./hello.txt&quot;); err == nil {
+	fmt.Printf(&quot;%s&quot;, b)
+)</pre><p> </p><ul><li>조건문 안에서 변수 생성했을 경우에는 바깥에서 사용 불가 (컴파일 에러)</li><li>Error rendering macro 'code': Invalid value specified for parameter 'lang'<pre>if b, err := ioutil.ReadFile(&quot;./hello.txt&quot;); err == nil {
+	fmt.Printf(&quot;%s&quot;, b) // 변수 b 사용 가능
+} else {
+	fmt.Printf(err) //  변수 err 사용 가능
+}
+ 
+ 
+fmt.Println(b) //  변수 b사용 불가
+fmt.Println(err) //  변수 err 사용 불가</pre></li></ul><p>17. for 반복문 사용</p><ul><li><p>ex)</p>Error rendering macro 'code': Invalid value specified for parameter 'lang'<pre>// default
+for i := 0; i &lt; 5; i++ {
+	fmt.Println(i)
+}
+ 
+for 조건식 {변화식}
+// 초깃값을 먼저 선언
+for 조건식 {
+	// 반복할 코드 작성
+	// 변화식 작성
+}
+ 
+// 무한루프
+for {}
+ 
+// 반복문에서 변수 여러개 사용
+for i, j := 0, 0; i &lt; 10; i, j = i + 1, j + 2 {
+	fmt.Println(i, j)
+}
+ 
+// 컴파일 에러
+for i, j := 0, 0; i &lt; 10; i++, j+=2 {  // syntax error: unexpected comma, expecting {
+	fmt.Println(i, j);
+}</pre><p>레이블 .............이해 잘 안돼</p></li></ul><p>19. switch 분기문 사용</p><ul><li>fallthrough // 밑에 케이스들도 전부 실행. 맨마지막 case에는 사용 불가  // 다음 케이스들이 무조건 실행 ..</li></ul>
+              <h1>go 3회차 (Unit 21 ~ 23)</h1>
+       <p> </p><p>Unit 21 : 배열 사용하기</p><p>Unit 22: 슬라이스 사용하기</p><p>Unit 23 : 맵 사용하기</p><p> </p><h5 id="go3회차(Unit21~23)-Unit21.배열">Unit 21. 배열</h5><hr /><ul><li>길이 고정. </li><li>배열을 다른 변수에 대입하면 배열 전체가 복사 됨.</li></ul><p> </p><p> </p><p> </p><p> </p><h5 id="go3회차(Unit21~23)-Unit22.슬라이스">Unit 22. 슬라이스</h5><hr /><ul><li>길이 고정 X, 동적으로 크기 늘어 남</li><li><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: py; gutter: false" style="font-size:12px;">var a []int // 길이가 0인 슬라이스
+ 
+var a[]int = make([]int, 5) // make 함수로 int형에 길이가 5인 슬라이스에 공간 할당
+var b = make([]int, 5) //  슬라이스를 선언할 때 자요형과 [] 생략
+c := make([], 5) // 슬라이스 선언할 때 var 키워드, 자료형, [] 생략 
+ 
+a := []int{33, 44, 55} //  슬라이스를 생성하면서 값을 초기화
+b := []int{
+	22,
+	33,
+	44,    // 마지막 요소에도 콤마 꼭!
+}
+ 
+var s = make([]int, 5, 10) // 슬라이스 길이가 5이고 용량이 10인 슬라이스 생성
+ 
+// 슬라이스에 다른 슬라이스를 붙이려면  append 함수를 사용할 때 ...을 사용.
+a := []int{1, 2, 3}
+b := []int{4, 5, 6}
+ 
+a = append(a, b...) //  슬라이스 a에 슬라이스 b를 붙일 때 b...을 사용</pre>
+</div></div></li><li>레퍼런스 타입</li><li><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: py; gutter: false" style="font-size:12px;">// 배열에 배열 대입
+a := [3]int{1, 2, 3}
+var b [3]int
+ 
+b = a //  배열의 요소가 모두 복사
+a[0] = 9 // b[0]에 9를 대입하면 b의 첫번째 요소만 바뀜
+ 
+fmt.Println(a) // [1 2 3]
+fmt.Println(b) // [9 2 3]
+ 
+// 슬라이스에 슬라이스 대입
+a := []int{1, 2, 3}
+var b []int
+ 
+b = a // a를 b에 대입해도 요소가 모두 복사되지 않고 참조만 됨
+b[0] = 9 // 슬라이스는 참조이므로 a[0], b[0]의 값이 모두 바뀜
+ 
+fmt.Println(a) // [9 2 3]
+fmt.Println(b) // [9 2 3]</pre>
+</div></div></li><li>슬라이스 복사</li><li><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: py; gutter: false" style="font-size:12px;">a := []int{1, 2, 3, 4, 5}
+b := make([]int, 3)
+ 
+copy(b, a) // 슬라이스 a의 요소를 슬라이스 b에 복사
+ 
+fmt.Println(a) // [1 2 3 4 5]
+fmt.Println(b) // [1 2 3] // 슬라이스 b의 길이는 3이므로 요소 3개만 복사 됨 </pre>
+</div></div></li></ul><p> </p><p> </p><p> </p><p> </p><h5 id="go3회차(Unit21~23)-Unit23.맵">Unit 23. 맵</h5><hr /><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: py; gutter: false" style="font-size:12px;">// 선언
+var a map[string]int = make(map[string]int)  // make 함수로 키는 string 값은 int인 맵 선언 
+var b = make(map[string]int)
+c := make(map[string]int)
+ 
+// 맵에 키 존재하는지 확인
+value, ok := solarSystem[&quot;Pluto&quot;] // 맵에 키가 있는지 검사할 때 리턴값을 두개 활용
+fmt.Println(value, ok) // 0 false :  맵에 키가 없으면 ok 변수에 false.
+ 
+// 맵에서 키 삭제
+a := map[string]int{&quot;Hello&quot;: 10, &quot;world&quot;: 20}
+delete(a, &quot;world&quot;)
+fmt.Println(a) // map[Hello: 10]
+ 
+//  맵 안에 맵 만들기
+aaa := map[string]map[string]float32{
+  &quot;mmm&quot;: map[string]float32{
+	&quot;aaa&quot;: 2323.1,
+	&quot;bbb&quot;: 5555.1,
+  }
+}
+fmt.Println(aaa[&quot;mmm&quot;][&quot;aaa&quot;]) // 2323.1</pre>
+</div></div><p><br />궁금한점</p><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: py; gutter: false" style="font-size:12px;">// Python
+&gt;&gt;&gt; a = [1, 2, 3]
+&gt;&gt;&gt; print a
+[1, 2, 3] 
+ 
+// Go
+a := [5]int{1, 2, 3, 4, 5}
+fmt.Println(a)
+[1 2 3 4 5]
+ 
+vb:= []int{33, 44, 55}
+fmt.Println(b)
+[33 44 55]
+ 
+왜 콤마가 없지..?</pre>
+</div></div><p><br /><br /></p>
+              <h1>go 4회차 (Unit 24 ~ 27)</h1>
+       <p>24. 함수 사용하기</p><ul><li><span style="background-color: transparent;">함수 정의가 어디에 있든 상관없이 함수 호출 가능</span></li><li>불편 사항 : func이 몇개를 리턴하는지 알아야 사용이 가능한게 불편.. 변수 하나로 받으려면 &quot;multiple-value SumAndDiff() in single-value context&quot; 에러가 남</li><li>좋은부분 : <ul><li>함수를 변수에 저장하기</li><li><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: bash; gutter: false" style="font-size:12px;">func sum(a int, b  int) int {
+	return a + b
+}
+ 
+func main() {
+	var hello func(a int, b int) int = sum
+	world := sum
+ 
+	fmt.Println(hello(1, 2))
+	fmt.Println(world(1, 2))
+}</pre>
+</div></div></li><li>익명 함수</li><li><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: bash; gutter: false" style="font-size:12px;">r := func(a int, b int) int { // 익명 함수를 정의한 뒤
+	return  a + b
+}(1, 2)    	// 바로 호출하여 리턴값을 변수 r에 저장
+fmt.Println(r) // 3</pre>
+</div></div></li></ul></li></ul><p>25. 클로저 사용하기</p><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: bash; gutter: false" style="font-size:12px;">func calc() func(x int) int { 
+	a,m b := 3, 5  				// 지역 변수는 함수가 끝나면 소멸되지만
+	return func(x int) int {   // 클로저 이므로 함수를 호출할 떄 마다 변수 a와 b의 값을 사용할 수 있음
+		return a * x + b
+	}
+}
+ 
+func main() {
+	f := calc()    // calc 함수를 실행하여 리턴값으로 나온 클로저를 변수에 저장
+ 
+	fmt.Println(f(1)) // 8
+	fmt.Println(f(2))  // 11
+}</pre>
+</div></div><p> </p><p> </p><p>26. 지연 호출 사용하기  // 스택(LIFO)와 자료구조 동일</p><ul><li>다른언어의  try finally구문과 비슷하게 동작하지만 문법이 더 간단함</li><li><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: bash; gutter: false" style="font-size:12px;">func hello() {
+	fmt.Println(&quot;Hello&quot;)
+}
+ 
+func world() {
+	fmt.Println({&quot;world&quot;)
+}
+ 
+func main() {
+	defer world() // 현재 함수 (main())가 끝나기 직전에 호출
+	hello()
+	hello()
+	hello()
+}</pre>
+</div></div><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: bash; gutter: false" style="font-size:12px;">func main() {
+	for i := 0; i &lt; 5; i ++ {
+		defer fmt.Printf(&quot;%d&quot;, i)
+	}
+}</pre>
+</div></div></li></ul><p>27. 패닉과 복구 사용하기</p><ul><li>panic  // python의 raise와 비슷</li><li><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: bash; gutter: false" style="font-size:12px;">func main() {
+	panic(&quot;Error !!!&quot;)
+	fmt.Println(&quot;Hello, World!&quot;) //  실행 X
+}
+ 
+ 
+ 
+panic: Error !!!
+goroutine 1 [running]:
+runtime.panic(0x47fb00, 0xc21000a150)
+	/usr/lib/go/src/pkg/runtime/panic.c:266 +0xb6
+main.main()
+	/Workspace/go/src/4/24.go:64 +0x55
+exit status 2
+shell returned 1
+
+</pre>
+</div></div></li><li>recover 예외처리 느낌 (except) ( panic 함수에서 설정한 에러메시지를 받아옴) // 반드시 지연 호출 함수로 사용해야 함</li><li><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: bash; gutter: false" style="font-size:12px;">func f() {
+	defer func() {  // recover 함수는 지연 호출로 사용해야 함
+		s := recover()   // 패닉이 발생해도 프로그램을 종료하지 않음,
+		   					// panic 함수에서 설정한 에러메시지를 받아옴
+		fmt.Println(s)
+	}()
+	panic(&quot;Error !!!&quot;) // panic 함수로 에러 메시지 설정, 패닉 발생
+}
+ 
+func main() {
+	f()
+	fmt.Println(&quot;Hello, World&quot;)  // 패닉이 발생했ㅎ지만 계속 실행 됨
+}</pre>
+</div></div></li></ul>
+              <h1>go 5회차(unit 28~32)</h1>
+       <h5 id="go5회차(unit28~32)-Unit28.포인터사용하기">Unit 28. 포인터 사용하기</h5><hr /><p> </p><p>변수를 선언할 떄 * 를 붙이면 포인터형 변수</p><p>변수를 사용할 때 * 를 붙이면 역참조</p><p> </p><p> 포인터형 변수에는 메모리 주소만 저장.</p><p> </p><p>변수 앞에 &amp; 를 붙이면 해당 변수의 메모리 주소를 뜻 함</p><p> </p><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: py; gutter: false" style="font-size:12px;">var num int = 1
+var numPtr *int = &amp;num
+ 
+fmt.Println(numPtr)
+fmt.Println(&amp;num)</pre>
+</div></div><p> </p><p>메모리 주소를 직접 대입하거나 포인터 연산을 허용 X</p><p>메모리 주소를 직접 조작 X</p><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: py; gutter: false" style="font-size:12px;">var numPtr *int = new(int)
+ 
+numPtr++  //  컴파일 에러. 포인터 연산은 허용하지 않음
+numPtr = 0x0820063d0 // 컴파일 에러. 메모리 주소를 직접 대입할 수 없음
+ 
+fmt.Println(numPtr) </pre>
+</div></div><p> </p><p> </p><p>28.1 함수에서 포인터형 매개변수 사용</p><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: py; gutter: false" style="font-size:12px;">func hello(n int) {
+	n = 2 			// 매개변수 n에 2를 대입
+} 
+ 
+func main() {
+	var n int = 1
+	hello(n)		// 1이 들어있는 변수 n을 hello 함수에 넘김
+	fmt.Println(n)	// 1 : hello 함수 안의  n에 2를 대입했지만 바깥의 n은 영향이 없음
+}
+ 
+----
+1
+----
+ 
+ 
+func hello(n *int) {
+	*n = 2 		// 포인터 변수 n을 역참조하여 메모리에 2를 대입
+}
+ 
+func main() {
+	var n int = 1
+	hello(&amp;n)		// 1이 들어있는 변수 n의 메모리 주소를 hello  함수에 넘김
+	fmt.Println(n)	// 2 : hello 함수에서 n의 메모리 공간에 2를 대입했으므로, 바깥에 있는 n이 값이 바뀌었음.
+}
+ 
+----
+2
+----</pre>
+</div></div><p> </p><p> </p><h5 id="go5회차(unit28~32)-Unit29.구조체사용하기">Unit 29.  구조체 사용하기</h5><hr /><p> </p><p>지역 변수  형태가 아닌 포인터에 메모리 공간 할당</p><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: py; gutter: false" style="font-size:12px;">var rect1 *Rectangle		// 구조체 포인터 선언
+rect1 = new(Rectangle)		// 구조체 포인터에 메모리 할당
+rect2 := new(Rectangle)		// 구조체 포인터 선언과 동시에 메모리 할당</pre>
+</div></div><p> </p><ul><li>구조체_인스턴스 = 구조체_타입{}</li></ul><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: py; gutter: false" style="font-size:12px;">var rect1 Rectangle = Rectangle{10, 20}		// 구조체 인스턴스를 생성하면서 값 초기화
+rect2 := Rectangle{45, 62} 					// var 키워드 생략 구조체 인스턴스를 생성하면서 값 초기화
+rect3 := Rectangle{width: 30, height: 15}	// 구조체 필드를 지정하여 값 초기화 </pre>
+</div></div><p> </p><p>구조체 인스턴스 필드에 접근할 때는 .을 사용</p><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: py; gutter: false" style="font-size:12px;">var rect1 Rectangle		// 구조체 인스턴스 생성
+var rect2 *Rectangle = new(Rectangle)	// 구조체 포인터 선언 후 메모리 할당
+ 
+rect1.height = 20		// 구조체 인스턴스의 필드에 접글할 때 .을 사용
+rect2.height = 62		// 꾸조체 포인터에 접근할 때도 . 을 사용
+ 
+fmt.Println(rect1)		// {0 20} : 구조체 인스턴스의 값
+fmt.Println(rect2)		// &amp;{0 62} : 구조체 포인터이므로 앞에 &amp;가 붙음</pre>
+</div></div><p> </p><p>함수에세 매개변수 사용</p><ul><li>구조체 포인터를 넘기는지,  구조체 인스턴스를 넘기는지에 따라 값이 변하고 안변하고.</li></ul><p> </p><p> </p><h5 id="go5회차(unit28~32)-Unit30.구조체에메서드연결">Unit 30. 구조체에 메서드 연결</h5><hr /><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: py; gutter: false" style="font-size:12px;">func (rect *Rectangle) scaleA(factor int) {		// 포인터 방식
+	rect.width = rect.width * factor			// 포인터이므로 원래의 값이 변경
+	Rect.height = rect.height * factor
+} 
+ 
+ 
+func (rect Rectangle) scaleB(factor int) {	// 일반 구조체 방식
+	rect.width = rect.width * factor		// 값이 복사되었으므로 원래의 값에는 영향을 미치지 않음
+	rect.height = rect.height * factor
+}
+ 
+func main() {
+	rect1 := Rectangle{30, 30}
+	rect1.scaleA(10)
+	fmt.Println(rect1)		// {300 300} : rect1에 바뀐 값이 들어감
+ 
+	rect2 := Rectangle{30, 30}
+	rect2.scaleB(10)
+	fmt.Println(rect2) 		// {30 30} : rect2는 값이 바뀌지 않음
+}</pre>
+</div></div><p> </p><p>리비서 변수를 사용하지 않으면 _ 로 변수를 생략할 수 있으나 변수를 사용해서 받아도 에러는 안남</p><p> </p><p> </p><h5 id="go5회차(unit28~32)-Unit31.구조체임베딩사용하기">Unit 31. 구조체 임베딩 사용하기</h5><hr /><p>구조체 안에 구조체 필드를 가지고 있으면 (Has-a) 관계가 됨.</p><p>구조체 안에 필드명 없이 타입만 선언하면 (Is-a)관계가 됨.</p><p> </p><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: py; gutter: false" style="font-size:12px;">package main
+import &quot;fmt&quot;
+type Person struct{  // 사람 구조체 정의
+    name string
+    age int
+}
+func (p *Person) greeting() { // 인사 (greeting) 함수 작성
+    fmt.Println(&quot;Hello~&quot;)
+}
+type Student struct {   
+    p   Person          // 학생 구조체 안에 사람 구조체를 필드로 가지고있음 (Has-a)
+    school string
+    grade int
+}
+func main() {
+    var s Student
+    s.p.greeting()  // Hello~
+}
+
+
+ 
+ 
+package main
+import &quot;fmt&quot;
+type Person struct{  // 사람 구조체 정의
+    name string
+    age int
+}
+func (p *Person) greeting() { // 인사 (greeting) 함수 작성
+    fmt.Println(&quot;Hello~&quot;)
+}
+type Student struct {   
+    Person      // 필드명 없이 타입만 선언하면 포함(Is-a) 관계가 됨
+    school string
+    grade int
+}
+func main() {
+    var s Student
+    
+    s.Person.greeting() // Hello~
+    s.greeting()        // Hell~
+}
+
+</pre>
+</div></div><p> </p><p>메소드 오버라이드.</p><p> </p><h5 id="go5회차(unit28~32)-Unit32.인터페이스사용하기">Unit 32. 인터페이스 사용하기</h5><hr /><p> 인터페이스는 메소드 집합.</p><p>빈 인터페이스에는 모든 자료형 사용 가능. 값을 꺼낼떄는 Type assert를 사용</p>
+              <h1>go 6회차 (Unit 33 ~ 35)</h1>
+       <h4 id="go6회차(Unit33~35)-Unit33.고루틴사용하기">Unit 33. 고루틴 사용하기</h4><hr /><p>고루틴 : 함수를 동시에 실행시키는 기능.</p><p> </p><p>함수를 호출할 때 앞에 go 키;워드를 붙이면 해당 함수는 고루틴으로 실행 됨.</p><p> </p><p>멀티코어</p><ul><li>go는 기본적으로 cpu 한개만 사용하도록 설정 되어 있음.</li><li>runtime.NumCPU로 현재 시스템의 CPU를 구하고</li><li>Runtime.GOMAXPROCS 함수에 설정해주면 됨.</li></ul><p> </p><p>클로저를 고루틴으로 실행하기</p><ul><li>반복문 안에서 변수 사용에 주의</li><li>일반 클로저는 반복문 안에서 순서대로 실행되지만 고루틴으로 실행한 클로저는 반복문이 끝난 뒤에 고루틴이 실행.</li></ul><p> </p><ul><li>클로저를 고루틴으로 실행할 때 반복문에 의해 바뀌는<span style="color: rgb(255,0,0);"> 변수는 반드시 매개변수로 넘겨줌.</span></li></ul><p> </p><h4 id="go6회차(Unit33~35)-Unit34.채널사용하기"><span style="color: rgb(0,0,0);">Unit 34. 채널 사용하기</span></h4><hr /><p>채널 : 고루틴끼리 데이터를 주고받고, 실행 흐름을 제어하는 기능.</p><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: py; gutter: false" style="font-size:12px;">package main
+import &quot;fmt&quot;
+func sum(a int, b int, c chan int) {
+    c &lt;- a + b		// 채널에  a와 b의 합을 보냄
+}
+func main() {
+    c := make(chan int)		// int 형 채널 생성
+    go sum(1, 2, c)			// sum을 고루틴으로 실행한 뒤 채널을 매개변수로 넘겨줌
+    n := &lt;- c				// 채널에서 값을 꺼낸 뒤 n에 삽입
+    fmt.Println(n)			// 3
+}
+
+</pre>
+</div></div><p> </p><p>채널을 사용하기 전에는 <span style="color: rgb(255,0,0);">반드시 make 함수로 공간을 할당해야 함.</span></p><p>동기채널 생성.</p><p><span style="color: rgb(255,0,0);">채널을 매개변수로 받는 함수는 반드시 go 키워드를 사용하여 고루틴으로 실행해야 함</span>.</p><p> </p><p>채널에 값을 보낼때 : 채널 &lt;- 값</p><p>채널에서 값을 가져올때 : &lt;- 채널</p><p> </p><p> </p><p>동기 채널이므로 채널에 값을 보내면 다른쪽에서 값을 꺼낼 떄까지 대기.</p><p> </p><p>동기채널 : </p><ul><li>보내는 쪽에서 값을 받을 때까지 대기.</li><li>받는 쪽에서는 채널에 값이 들어올 떄 까지 대기.</li><li>고루틴의 코드 실행 순서를 제어할 수 있다.</li></ul><p> 채널 버퍼링 : 채널의 버퍼가 가득차면 값을 꺼내서 출력</p><p> </p><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: py; gutter: false" style="font-size:12px;">package main
+import (
+    &quot;fmt&quot;
+    &quot;runtime&quot;
+)
+func main() {
+    runtime.GOMAXPROCS(1)
+    done := make(chan bool, 2)      // 버퍼가 2개인 비동기 채널 생성
+    count := 4                      // 반복할 횟수
+    go func() {
+        for i := 0; i &lt; count; i++ {
+            done &lt;- true                // 채널에 true를 보냄, 버퍼가 가득 차면 대기
+            fmt.Println(&quot;고루틴 : &quot;, i) // ㅊ반복문의 변수 출력
+        }
+    }()
+    for i := 0; i &lt; count; i++ {
+        &lt;-done                      // 버퍼에 값이 없으면 대기, 값을 꺼냄
+        fmt.Println(&quot;메인함수 : &quot;, i)       // 반복문의 변수 출력
+    }
+}
+
+
+----
+ 
+고루틴 :  0
+고루틴 :  1
+메인함수 :  0
+메인함수 :  1
+고루틴 :  2
+고루틴 :  3
+메인함수 :  2
+메인함수 :  3
+
+</pre>
+</div></div><p> </p><p>range, close</p><p> </p><ul><li>이미 닫힌 채널에 값을 보내면 패닉 발생</li><li>채널을 닫으면 range 루프가 종료 됨</li><li>채널이 열려있고, 값이 들어오지 않는다면 range는 실행되지 않고 계속 대기, 만약 다른 곳에서 채널에 값을 보냈다면(채널에 값이 들어오면) 그떄부터 range가 계속 반복<br /><br /></li></ul><p>보내기 전용 및 받는 전용 채널 사용</p><ul><li>값의 흐름이 한 방향으로 고정된 채널</li></ul><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: py; gutter: false" style="font-size:12px;">package main
+import &quot;fmt&quot;
+func producer(c chan&lt;- int) { // 보내기 전용 채널
+    for i := 0; i &lt; 5; i ++ {
+        c &lt;- i
+    }
+    c &lt;- 100    // 채널에 값을 보냄
+    // fmt.Println(&lt;-c) // 채널에서 값을 꺼내면 컴파일 에러
+}
+func consumer(c &lt;- chan int) { // 받기 전용 채널
+    for i := range c {
+        fmt.Println(i)
+    }
+    fmt.Println(&lt;-c) //  채널에 값을 꺼냄
+    // c &lt;-1 //  채널에 값을 보내면 컴파일 에러
+}
+func main() {
+    c := make(chan int)
+    go producer(c)
+    go consumer(c)
+    fmt.Scanln()
+}
+
+
+----
+ 
+0
+1
+2
+3
+4
+100</pre>
+</div></div><p> </p><p>셀렉트 사용하기</p><ul><li>select { case &lt;- 채널: 코드 }</li></ul><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: py; gutter: false" style="font-size:12px;">package main
+import (
+    &quot;fmt&quot;
+    &quot;time&quot;
+)
+func main() {
+    c1 := make(chan int)
+    c2 := make(chan string)
+    go func() {
+        for {
+            c1 &lt;- 10
+            time.Sleep(100 * time.Millisecond)
+        }
+    }()
+    go func() {
+        for {
+            c2 &lt;- &quot;Hello, World!&quot;
+            time.Sleep(500 * time.Millisecond)
+        }
+    }()
+    go func() {
+        for {
+            select {
+            case i := &lt;- c1:
+                fmt.Println(&quot;c1 : &quot;, i)
+            case s := &lt;- c2:
+                fmt.Println(&quot;c2 :&quot;, s)
+            }
+        }
+    }()
+    time.Sleep(10 * time.Second)
+}
+
+</pre>
+</div></div><p> </p><h4 id="go6회차(Unit33~35)-Unit35.동기화객체사용하기">Unit 35. 동기화 객체 사용하기</h4><hr /><p>동기화 객체</p><ul><li>Mutex :  뮤텍스. 상호 배제라고도 하며 여러 스레드(고루틴) 에서 공유되는 데이터를 보호할 때 주로 사용</li><li>RWMutex :  읽기/쓰기 뮤텍ㄷ스. 읽기와 쓰기 동작을 나누어서 잠금(락)을 걸 수 있다.</li><li>Cond : 조건 변수. 대기하고 있는 하나의 객체를 깨울 수도 있고 여러 개를 동시에 깨울 수 동 씨다</li><li>Once : 특정 함수를 딱 한번만 실행할 때 사용</li><li>Pool : 멀티 스레드(고루틴) 에서 사용할 수 있는 객체 풀.  자주 사용하는 객체를 풀에 보관했다가 다시 사용</li><li>WaitGroup :  고루틴이 모두 끝날때 까지 기다리는 기능</li><li>Atomic :  원자적 연산이라고도 하며 더이상 쪼갤수 없는 연산. 멀티 스레드(고루틴), 멀티 코어 환경에서 안전하게 값을 연산하는 기능.</li></ul><p> </p><p>뮤텍스</p><ul><li>sync.Mutex</li><li>func (m *Mutex) Lock():</li><li>func (m *Mutex) Unlock():</li></ul><p>runtime.GoSched()  //  다른 고루틴이 CPU를 사용할 수 있도록 양보(yield)</p><p> </p><p>rwMutex.Lock() // 쓰기 뮤텍스 잠금, 쓰기 보호 시작</p><p>rwMutex.Unlock()  // 쓰기 뮤텍스 잠금 해제, 쓰기 보호 종료</p><p>rwMutex.Rlock() // 읽기 뮤텍스 잠금, 읽기 보호 시작</p><p>rwMutex..RUnlock() // 읽기 뮤텍스 잠금 해제, 읽기 보호 종료</p><p> </p><p> </p><p>조건 변수 사용하기</p><ul><li>대기하고 있는 객체 하나만 꺠우거나 여러개를 동시에 깨울 떄 사용</li></ul><p>Sync 패키지에서 제공하는 조건 변수의 함수</p><ul><li>sync.Cond</li><li>func NewCond(I Locker) *Cond :  조건 변수 생성</li><li>func (c *<strong>Cond) Wait(</strong>) :  고루틴 실행을 멈추고 대기</li><li>func (c *Cond) signal() :  대기하고 있는 고루틴 하나만 깨움</li><li>func (c *Cond) Broadcase() :  대기하고 있는 모든 고루틴을 깨움</li></ul><p> </p><p>함수를 한번만 실행하기</p><ul><li>sync.Once</li><li>func (*Once) Do(f func()):  함수를 한 번만 실행</li></ul><p>풀 사용하기</p><ul><li>sync.Pool</li><li>func(p *Pool) Get() interface{} : 풀에 보관된 객체를 가져옴</li><li>func(p *Pool) Put(x interface{}) :  풀에 객체를 보관</li></ul><p>대기 그룹 사용하기</p><ul><li>sync.WaitGroup</li><li>func (wg *WaitGroup) Add(delta int) :  대기 그룹에 고루틴 개수 추가</li><li>func (wg *WaitGroup) Done() :  고루틴이 끝났다는 것을 알려줄 때 사용</li><li>func (wg *WaitGroup) Wait() :  모든 고루틴이 끝날 때 까지 기다림</li></ul><p>원자적 연산 사용하기</p><ul><li>Add  계열 : 변수에 값을 더하고 결과를 리턴합니다.</li><li>CompareAndSwap 계열 : 변수 A와 B를 비교하여 같으면 C를 대입합니다. 그리고 A와 B가 같으면 true, 다르면 false를 리턴</li><li>Load 계열 : 변수에서 값을 가져옴.</li><li>Store 계열 : 변수에 값을 저장</li><li>Swap 계열 : 변수에 새 값을 대입하고, 이전 값을 리턴</li></ul>
+              <h1>go 7회차 (Unit 36 ~ 44)</h1>
+       <h4 id="go7회차(Unit36~44)-Unit36.리플렉션사용하기">Unit 36.  리플렉션 사용하기</h4><hr /><p>리플렉션</p><ul><li>실행시점에 인터페이스나 구조체 등의 타입 정보를 얻어 내거나 결정하는 기능. ex) python - type</li><li>reflect.TypeOf(f) //  f의 타입 정보</li><li>reflect.ValueOf(f) //  값 정보</li><li>f.Kind(), f.Type()</li></ul><p>구조체 필드의 태그</p><ul><li>`태그명: &quot;내용&quot;`  형식으로 지정.</li><li>태그는 문자열 형태이며, 무자열 안에 &quot;&quot;(따옴포)가 포함되므로 ``(백쿼트)로 감싸준다. 여러개를 지정할 때는 공백으로 구분.<br /><br /></li></ul><h4 id="go7회차(Unit36~44)-Unit37.동적으로함수생성하기//잘모르겠다">Unit 37. 동적으로 함수 생성하기 //  잘 모르겠다</h4><hr /><p>reflect.MakeFunc </p><p> </p><h4 id="go7회차(Unit36~44)-Unit38.인터넷소스저장소의패키지사용하기">Unit 38. 인터넷 소스 저장소의 패키지 사용하기</h4><hr /><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: py; gutter: false" style="font-size:12px;">import (
+	&quot;fmt&quot;
+	. &quot;github.com/golang/example/stringutil&quot; //  전역 패키지 주소를 바로 등록 가능
+) </pre>
+</div></div><p> </p><h4 id="go7회차(Unit36~44)-Unit39.패키지만들기">Unit 39. 패키지 만들기</h4><hr /><p>기준 디렉토리: GOPATH/src</p><p> </p><p>패키지를 컴파일 하여 라이브러리로 만들려면 go install 명령을 사용.</p><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: bash; gutter: false" style="font-size:12px;">$ cd $GOPATH/src/calc
+~/hello_project/src/calc$ go install
+ </pre>
+</div></div><p> </p><h4 id="go7회차(Unit36~44)-Unit40.문서화하기">Unit 40. 문서화 하기</h4><hr /><p>package 키워드와 함수 정의 바로 위에 // 주석 형태로 함수 설명을 작성</p><p>GOPATH 디렉토리에서 godoc 명령을 실행</p><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: bash; gutter: false" style="font-size:12px;">sudo apt-get install golang-go.tools</pre>
+</div></div><p> </p><p>godoc &lt;패키지 이름&gt;</p><p>godoc &lt;패키지 이름&gt; &lt;함수 이름&gt;</p><p> </p><p>godoc -http=:&lt;포트번호&gt;  // 웹서버</p><p> </p><p> </p><h4 id="go7회차(Unit36~44)-Unit41.출력함수사용하기">Unit 41. 출력 함수 사용하기</h4><hr /><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: bash; gutter: false" style="font-size:12px;">fmt.Print() //  값을 그 자리에 출력 (새 줄로 넘어가지 않음)
+fmt.Println() //  값을 출력한 뒤 새 줄로 넘어감(개행)
+fmt.Printf() //  형식을 지정하여 값을 출력
+ 
+ 
+fmt.Println(&#39;aaa&#39;)
+aaa
+ 
+fmt.Print(&#39;a&#39;)
+fmt.Print(&#39;b&#39;)
+ab			// 모든 값이 붙어서 출력 
+ 
+var num1 int = 10
+fmt.printf(&quot;정수 : %d\n&quot;, num1) // 첫번째 매개변수에 출력할 형식을 지정, 두번째 출력할 값
+정수 : 10
+ </pre>
+</div></div><p> </p><h4 id="go7회차(Unit36~44)-Unit42.입력함수사용하기">Unit 42. 입력 함수 사용하기</h4><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: bash; gutter: false" style="font-size:12px;">fmt.Scan() //  콘솔에서 공백, 새 줄로 구분하여 입력을 받음
+fmt.Scnaln() //  콘솔에서 공백으로 구분하여 입력을 받음
+fmt.Scanf() // 콘솔에서 형식을 지정하여 입력을 받음
+ 
+ 
+n, _ := fmt.Scna(&amp;s1, &amp;s2) //  fmt.Scan 함수의 두 번째 리턴값은 생략
+fmt.Println(n)
+2				//  입력 갯수</pre>
+</div></div><p> </p><h4 id="go7회차(Unit36~44)-Unit43.문자열입출력함수사용하기">Unit 43. 문자열 입출력 함수 사용하기</h4><hr /><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: bash; gutter: false" style="font-size:12px;">fmt.Sprint() //  값을 그대로 문자열로 만듦
+fmt.Sprintln() //  값을 그대로 문자열로 만든 뒤 문자열 끝에 개행문자(\n)를 붙임
+fmt.Sprintf() //  형식을 지정하여 문자열을 만듦
+fmt.Sscan() //  공백, 개행 문자로 구분된 문자열에서 입력을 받음
+fmt.Sscanln() //  공백으로 구분된 문자열에서 입력을 받음
+fmt.Sscanf() // 문자열에서 형식을 지정하여 입력을 받음</pre>
+</div></div><p> </p><h4 id="go7회차(Unit36~44)-Unit44.파일입출력함수사용하기">Unit 44. 파일 입출력 함수 사용하기</h4><hr /><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: bash; gutter: false" style="font-size:12px;">os
+Create() //  기존 파일을 열거나 새 파일을 생성
+Open() //  기존 파일 열기
+(f (File) Close() error//  열린 파일을 닫음
+ 
+fmt.Fprint() //  값을 그대로 문자열로 만든 뒤 파일에 저장
+fmt.Fprintln() //  값을 그대로 문자열로 만든 뒤 문자열 끝에 개행 문자(\n)를 붙이고 파일에 저장
+fmt.Fprintf() //  형식을 지정하여 파일에 저장
+fmt.Fscan() //  파일을 읽은 뒤 공백, 개행 문자로 구분된 문자열에서 입력을 받음
+fmt.Fscanln() //  파일을 읽은 뒤 공백으로 구분된 문자열에서 입력을 받음
+fmt.Fscanf() //  파일을 읽은 뒤 문자열에서 형식을 지정하여 입력을 받음</pre>
+</div></div><p> </p><p> </p>
+              <h1>go 8회차 (Unit 45 ~ 51)</h1>
+       <h5 id="go8회차(Unit45~51)-Unit45.유니코드와UTF-8함수사용하기">Unit 45. 유니코드와 UTF-8 함수 사용하기</h5><hr /><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: bash; gutter: false" style="font-size:12px;">import (
+	&quot;unicode&quot;  // 유니코드
+	&quot;unicode/utf8&quot; // utf-8
+)</pre>
+</div></div><p> </p><h5 id="go8회차(Unit45~51)-Unit46.문자열처리하기">Unit 46. 문자열 처리하기</h5><hr /><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: bash; gutter: false" style="font-size:12px;">func Contains(s, substr string) bool //  문자열이 포함되어 있는지 검색
+ContainsAny(s, chars string) bool // 특정 문자가 하나라도 포함되어 있는지 검색
+...
+ </pre>
+</div></div><p> </p><h5 id="go8회차(Unit45~51)-Unit47.문자열변환함수사용하기">Unit 47. 문자열 변환 함수 사용하기</h5><hr /><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: bash; gutter: false" style="font-size:12px;">func Itoa(i int) string // 숫자를 문자열로 변환
+func Atoi(s string) (i int, err errors) // 숫자로 이루어진 문자열을 숫자로 변환
+...
+ </pre>
+</div></div><p> </p><h5 id="go8회차(Unit45~51)-Unit48.정규표현식사용하기">Unit 48. 정규표현식 사용하기</h5><hr /><p> </p><p> </p><h5 id="go8회차(Unit45~51)-Unit49.파일처리하기">Unit 49. 파일 처리하기</h5><hr /><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: bash; gutter: false" style="font-size:12px;">import(
+  &quot;os&quot;
+)
+ 
+file, err :=os.Create(&quot;aa.txt&quot;) //  파일 생성
+if err != nil {
+	fmt.Println(err)
+	return
+}
+defer file.close() //  메인 함수가 끝나기 전에 파일을 닫음
+ 
+s := &quot;Hello. world!&quot;
+...
+file.Wright([]byte(s)_ // s를 []byte  바이트 슬라이스로 변환, s를 파일에 저장
+...
+ 
+fi, err := file.Stat() //  파일 정보 가져오기
+ 
+var data = make([]btyte, fi.Size()) //  파일 크기만큼 바이트 슬라이스 생성
+file.Read(data)
+fmt.Println(string(data)) //  문자열로 변환하여 data의 내용 출력
+ 
+ 
+ioutil 패키지 사용하기
+import (
+  &quot;os&quot;
+  &quot;io/ioutil&quot;
+)
+ 
+s := &quot;Hello, World&quot;
+err := ioutil.WriteFile(&quot;hello.txt&quot;, []byte(s), os.FileMode(644)) // s를 []byte 바이트 슬라이스로 변환, s를 hello.txt 파일에 저장
+ 
+data, err := ioutil.ReadFile(&quot;hello.txt&quot;) // hello.txt의 내용을 읽어서 바이트 슬라이스 리턴</pre>
+</div></div><p> </p><h5 id="go8회차(Unit45~51)-Unit50.입출력인터페이스사용하기">Unit 50. 입출력 인터페이스 사용하기</h5><hr /><p> </p><p> </p><h5 id="go8회차(Unit45~51)-Unit51.JSON문서사용하기">Unit 51. JSON 문서 사용하기</h5><hr /><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: bash; gutter: false" style="font-size:12px;">import (
+	&quot;encoding/json&quot;
+)
+ 
+data := make(map[string]interface{})
+data[&quot;name&quot;] = &quot;maria&quot;
+data[&quot;age&quot;] = 10
+ 
+doc, _ := json.Marshal(data)
+ 
+var data2 map[string]interface{}
+json.Unmarshal([]byte(doc), &amp;data2) // doc를 바이트 슬라이스로 변환하여 넣고, data의 포인터를 넣어줌
+ 
+ 
+doc, _ := json.MarshalIndent(data, &quot;&quot;, &quot; &quot;) // 사람이 수비게 읽을 수 있도록 변환
+{
+	&quot;age&quot;&quot;: 10,
+	&quot;name&quot;: &quot;maria&quot;
+}
+ 
+구조체 활용하기
+{
+	&quot;a&quot;: {
+		&quot;a-1&quot;: &quot;11&quot;,
+		&quot;a-2&quot;: &quot;22
+	},
+	&quot;b&quot;: &quot;bbb&quot;
+}</pre>
+</div></div>
+              <h1>go 9회차 (Unit  52 ~ 55)</h1>
+       <h5 id="go9회차(Unit52~55)-Unit52.압축사용하기">Unit 52. 압축 사용하기</h5><hr /><p>파일을 열땐 os</p><p>압축 인스턴스는 gzip</p><p>압축 인스턴스를 읽을때는  ioutil</p><p> </p><p>너무 많은 라이브러리를 사용..</p><p> </p><h5 id="go9회차(Unit52~55)-Unit53.암호화사용하기">Unit 53. 암호화 사용하기</h5><hr /><p> </p><p> </p><h5 id="go9회차(Unit52~55)-Unit54.정렬활용하기">Unit 54. 정렬 활용하기</h5><hr /><p>sort.Reverse가 내림차순인데.</p><p>겉에 또 sort.Sort를 싸야한다..?</p><p> </p><p> </p><h5 id="go9회차(Unit52~55)-Unit55.컨테이너사용하기">Unit 55. 컨테이너 사용하기</h5><ul><li>연결리스트</li><li>힙<ul><li>push함수로 값을 넣을때마다 정렬됨.</li></ul></li><li>링<ul><li>원형으로 연결된 이중 연결 리스트. 처음과 끝이 없고 nul을 가르키는 노드는 존재 X</li><li>r.Next()와 같이 현재 위치를 바꿔주어야 함</li></ul></li></ul>
+              <h1>go 10회차 (Unit 56 ~)</h1>
+       <h5 id="go10회차(Unit56~)-Unit56.TCP프로토콜사용하기">Unit 56. TCP 프로토콜 사용하기</h5><hr /><ul><li><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: py; gutter: false" style="font-size:12px;">net.Listen(&quot;tcp&quot;, &quot;:8000&quot;) //  외부도 Open
+net.Listen(&quot;tcp&quot;, &quot;192.160.0.100:6000&quot;) // 해당 nic만 open</pre>
+</div></div></li><li><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: bash; gutter: false" style="font-size:12px;">func Listen(net, laddr string) (Listener, error) :  프로토콜, ip 주소, 포트 번호를 설정하여 네트워크 연결을 대기
+func (I * TCPListener) Accept() (Conn, error) :  클라이언트가 연결되면 tcp연결(커넥션)을 리턴
+func (I * TCPListener) Close() error: tcp 연결 대기를 닫음
+func (c * TCPConn) Read(b []byte) (int, error) :  받은 데이터를 읽음
+func (c * TCPConn) Write(b []byte) (int, error) :  데이터를 보냄
+func (c * TCPConn) Close() error : tcp 연결을 닫음</pre>
+</div></div></li></ul><p>Ctrl + C 로 종료되지 않는것 같음.. 좀비로 남아있음</p><p>signal 받아서 종료하는 코드를 추가해야하는것 같다.</p><p>ex)</p><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: bash; gutter: false" style="font-size:12px;">http.HandleFunc(&quot;/exit&quot;, func(res http.ResponseWriter, req *http.Request) {
+    fmt.Println(&quot;exit&quot;)
+    os.Exit(0)
+})</pre>
+</div></div><p> </p><p> </p><p>handler와 handlefunc의 차이는?????</p><ul><li>handler는 interface</li><li>handlefunc 형식은 일반 함수를 http 처리기로 사용할 수 있도록 하는 어댑터</li></ul><p><a href="https://www.joinc.co.kr/w/man/12/golang/networkProgramming/WebServer" class="external-link" rel="nofollow">https://www.joinc.co.kr/w/man/12/golang/networkProgramming/WebServer</a></p>
+              <h1>LetEatGo</h1>
+       <h3 id="LetEatGo-backend:">backend : </h3><ul><li>go</li></ul><p> </p><h3 id="LetEatGo-front-end:"><strong>front-end : </strong></h3><ul><li>vue  + bootstrap</li></ul><p> </p><h3 id="LetEatGo-DB:">DB :</h3><ul><li>postgresql</li></ul><h3 id="LetEatGo-WAS:"><strong>WAS :</strong></h3><ul><li>Nginx </li></ul><p> </p><h3 id="LetEatGo-개발환경:"><strong>개발환경 : </strong></h3><ul><li>Docker</li></ul><p> </p><h3 id="LetEatGo-AWS"><strong>AWS</strong></h3><p> </p><hr /><p> </p><p>go framework</p>
+              <h1>pyinstaller</h1>
+       <div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: java; gutter: false" style="font-size:12px;">$ /usr/local/cdnet/shared/python/python2.7/bin/virtualenv sso
+$ cd sso
+$ source bin/activate
+$ pip install pysaml2==4.0.0
+$ mkdir src
+$ cd src
+$ cp $files.. .
+$ pip install pyinstaller
+$ pyinstaller -F src/lib_idp.py -n sso -p src/</pre>
+</div></div>
+              <h1>rest</h1>
+       <p>hateoas</p><ul><li><a href="https://restfulapi.net/hateoas/" class="external-link" rel="nofollow">https://restfulapi.net/hateoas/</a></li></ul>
+              <h1>Vue</h1>
+       <h4 id="Vue-구조">구조</h4><hr /><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Midnight; brush: bash; gutter: false" style="font-size:12px;">$ cd src/
+.
+├── App.vue
+├── assets
+│   └── logo.png
+├── components
+│   ├── Example.vue
+│   ├── HelloWorld.vue
+│   └── TodoPage.vue
+├── main.js
+└── router
+    └── index.js
+
+</pre>
+</div></div><h5 id="Vue-router">router</h5><ul style="list-style-type: square;"><li>index.js<ul style="list-style-type: square;"><li>urls와 비슷</li></ul><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: js; gutter: false" style="font-size:12px;">import Vue from &#39;vue&#39;
+import Router from &#39;vue-router&#39;
+import HelloWorld from &#39;@/components/HelloWorld&#39;
+
+Vue.use(Router)
+export default new Router({
+  routes: [
+    {
+      path: &#39;/&#39;,
+      name: &#39;Hello&#39;,
+      component: HelloWorld
+    }
+  ]
+})
+
+</pre>
+</div></div></li></ul><h5 id="Vue-components//실제vue코드들!">components  // 실제 vue 코드들!</h5><ul><li>HelloWorld.vue</li><li>&lt;template&gt;  // html</li><li>&lt;script&gt; // js 코드</li><li>&lt;style&gt; // css </li></ul><p> </p><p>main.js</p><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: js; gutter: false" style="font-size:12px;">import Vue from &#39;vue&#39;
+import App from &#39;./App&#39;
+import router from &#39;./router&#39;
+Vue.config.productionTip = false
+
+new Vue({
+  el: &#39;#app&#39;,
+  router,
+  components: { App },
+  template: &#39;&lt;App/&gt;&#39;
+})</pre>
+</div></div><p> </p><p> </p><h1 id="Vue-실행방법">실행 방법</h1><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: bash; gutter: false" style="font-size:12px;">$ vue init webpack todos-client // project 생성
+$ cd todos-client
+$ npm run dev  // run server..
+ </pre>
+</div></div><p> </p><p> </p><p> </p><h2 id="Vue-참고URL">참고 URL</h2><p><strong><a href="https://kr.vuejs.org/v2/guide/syntax.html" class="external-link" rel="nofollow">https://kr.vuejs.org/v2/guide/syntax.html</a></strong></p><p><strong><br /></strong></p><p> </p>
+          </body>
+</html>
