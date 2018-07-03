@@ -171,3 +171,11 @@ export default {
 }
 
 ```
+
+Link : [Google](https://google.com)
+*single asterisks*
+_single underscores_
+**double asterisks**
+__double underscores__
+++underline++
+~~cancelline~~

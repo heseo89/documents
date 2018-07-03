@@ -1,5 +1,17 @@
-# framework 조사
+# go package install
+```
+go get github.com/gin-gonic/gin
+go get github.com/jinzhu/gorm
+go get github.com/jinzhu/gorm/dialects/postgres
+go get github.com/dgrijalva/jwt-go
+```
 
-web framework : https://www.slant.co/topics/1412/~web-frameworks-for-go
-1위가 gin-gonic (https://gin-gonic.github.io/gin/)
-example : https://github.com/jhjang-dev/koreannet
+# postgresql user 설정
+참고 URL : http://brownbears.tistory.com/19
+
+## postgresql user 정보
+```
+DBNAME : test
+Username : test
+Password : 1234
+```
