@@ -32,8 +32,35 @@
 9. 두번째 메뉴
 10. Finish the installation
 
-###
-* 한글 설정
+### apt setting
 ```
-$ sudo apt-get install fonts-unfonts-core
+$ sudo apt-get update
+$ sudo apt-get upagrade
+$ sudo apt-get install fonts-unfonts-core // 한글 설정
+
+```
+
+### 해상도 설정
+* 안돼 ㅡㅡ
+```
+$ cp /media/cdrom0/* /home/pi/Downloads
+$ cd /home/pi/Downloads
+$ sudo ./VBoxLinuxAdditions.run
+$ vi /etc/X11/xorg.conf
+
+Section "Device"
+    Identifier  "Configured Video Device"
+    Driver      "vboxvideo"
+EndSection
+
+Section "Monitor"
+    Identifier  "Configured Monitor"
+EndSection
+
+Section "Screen"
+    Identifier  "Default Screen"
+    Monitor     "Configured Monitor"
+    Device      "Configured Video Device"
+EndSection
+$ sudo reboot
 ```
